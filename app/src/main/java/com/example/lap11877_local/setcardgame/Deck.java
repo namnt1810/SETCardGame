@@ -88,7 +88,6 @@ public class Deck {
     }
 
     public boolean isValidIndex (int randomIndex){
-        return 0<= randomIndex && randomIndex < TOTAL_CARDS;
+        return 0 <= randomIndex && randomIndex < TOTAL_CARDS;
     }
-
 }

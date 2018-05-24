@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class SETcardGame extends AppCompatActivity implements View.OnClickListener {
+public class MainGameActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView[] mImageViews;
 
@@ -73,13 +73,16 @@ public class SETcardGame extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        /*
+
         // 1. Check number of card was selected, is it less than or equal 3;
         // 1.1 How to instruct computer which cards are selected? => data structure.
         // 1.2 How to know number of selected cards.
 
 
         int id = v.getId();
+
+
+
         if (mSelectedCardIds.contains(id)) { // Check if re-select
             // Nothing to do here since this card exists in selected cards.
             return;
@@ -100,7 +103,8 @@ public class SETcardGame extends AppCompatActivity implements View.OnClickListen
 
         // 2. Validate the selected cards if they're a set.
         // 3. Reset cards background to default after processed above steps.
-        */
+
+
         int viewId = v.getId();
         Card card = mViewIdToCards.get(viewId);
         Toast.makeText(this, card.toString(), Toast.LENGTH_SHORT).show();

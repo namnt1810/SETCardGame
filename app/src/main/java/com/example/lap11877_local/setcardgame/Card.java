@@ -37,10 +37,10 @@ public class Card {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("card: { ");
-        sb.append("shape=").append(resolveShape()).append(", ");
-        sb.append("shading=").append(resolveShading()).append(", ");
+        sb.append("count=").append(resolveCount()).append(", ");
         sb.append("color=").append(resolveColor()).append(", ");
-        sb.append("count=").append(resolveCount()).append(" }");
+        sb.append("shading=").append(resolveShading()).append(", ");
+        sb.append("shape=").append(resolveShape()).append(" }");
         return sb.toString();
     }
 
