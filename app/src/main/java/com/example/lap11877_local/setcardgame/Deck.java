@@ -5,6 +5,9 @@ import com.example.lap11877_local.setcardgame.Features.Count;
 import com.example.lap11877_local.setcardgame.Features.Shading;
 import com.example.lap11877_local.setcardgame.Features.Shape;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 
 public class Deck {
@@ -14,12 +17,15 @@ public class Deck {
 
     private final Card[] mDeck = new Card [TOTAL_CARDS];
 
+    private final Map<String, Integer> mCardResIdMap = new HashMap<>();
+
     private Random mRandom = new Random();
 
     private int mCardsLeft = TOTAL_CARDS;
 
     public Deck(){
         makeDeck();
+        makeImagesResourceMap();
     }
 
     private void makeDeck(){
@@ -43,13 +49,26 @@ public class Deck {
                         shading = shadings[shadingIndex];
                         shape = shapes [shapeIndex];
 
-                        mDeck[cardsIndex] = new Card(count, color, shading, shape);
+//                        String cardIdString = String.format(Locale.getDefault(),
+//                                Card.CARD_ID_FORMAT,
+//                                countIndex, colorIndex, shadingIndex, shapeIndex);
+
+                        Card card = new Card(count, color, shading, shape);
+//                        Integer cardImageResId = mCardResIdMap.get(cardIdString);
+//                        card.setImageRes(cardImageResId);
+
+                        mDeck[cardsIndex] = card;
                         cardsIndex++;
 
                     }
                 }
             }
         }
+    }
+
+    private void makeImagesResourceMap() {
+        //TODO: initialize resource map here, do manually.
+        mCardResIdMap.put("0000", R.drawable.blue_card_01);
     }
 
     public Card[] makeTable(){
@@ -89,5 +108,21 @@ public class Deck {
 
     public boolean isValidIndex (int randomIndex){
         return 0 <= randomIndex && randomIndex < TOTAL_CARDS;
+    }
+
+    public Card[] generateCards(int numberOfCardsToGenerate) {
+        if (isEmpty()) {
+            // Game end, no more cards left.
+            return null;
+        }
+
+        Card[] cards = new Card[numberOfCardsToGenerate];
+        for(int i = 0; i < numberOfCardsToGenerate; i++) {
+            int availableIndex = getAvailableIndex();
+            if (POSITION_NONE != availableIndex) {
+                cards[i] = mDeck[availableIndex];
+            }
+        }
+        return cards;
     }
 }

@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class GameTable {
+    public static final int NO_INDEX = -1;
+
     private Card[] mCards;
 
     private final int NUM_OF_TABLE_CARDS = 12;
@@ -38,7 +40,6 @@ public class GameTable {
     }
 
     public void refill (Card[] cardsToFill){
-
         //check if cardsToFill is invalid or empty
         if (cardsToFill == null || cardsToFill.length == 0){
             System.out.println ("cardsToFill is invalid or empty");
@@ -75,6 +76,22 @@ public class GameTable {
         }
     }
 
+    public int getIndexFromViewId(int viewId) {
+        Integer index = mViewIdsToCardIndices.get(viewId);
+        if (index == null) {
+            return NO_INDEX;
+        }
+        return index;
+    }
+    public Card getCardFromViewId (int viewId){
+        Card card = null;
+        Integer index = mViewIdsToCardIndices.get(viewId);
+        if (isValidIndex(index)){
+            card = mCards[index];
+        }
+        return card;
+    }
+
     /**matchingElements method match viewIds of refilled cards
      * to selected cardElements of the deck
      */
@@ -91,6 +108,26 @@ public class GameTable {
 
         for (int i = 0; i < viewIds.length ; i++) {
             mViewIdsToCardIndices.put(viewIds[i], cardPositions[i]);
+        }
+    }
+
+    public int[] getEmptyCardPositions(){
+        int size = mEmptyPositions.size();
+
+        int[] emptyPos = new int[size];
+        Iterator<Integer> iterator = mEmptyPositions.iterator();
+        for (int i = 0; i < size; i++) {
+            emptyPos[i] = iterator.next();
+        }
+        return emptyPos;
+    }
+
+    public void removeCardsByViewIds(Set<Integer> viewIds) {
+        if (null == viewIds || viewIds.isEmpty()) {
+            return ;
+        }
+        for (Integer viewId : viewIds) {
+            remove(mViewIdsToCardIndices.get(viewId));
         }
     }
 }

@@ -6,10 +6,13 @@ import com.example.lap11877_local.setcardgame.Features.Shading;
 import com.example.lap11877_local.setcardgame.Features.Shape;
 
 public class Card {
+    public static final String CARD_ID_FORMAT = "%d%d%d%d";
+
     private Count mCount;
     private Color mColor;
     private Shading mShading;
     private Shape mShape;
+    private int mImageRes;
 
     public Card (Count mCount, Color mColor, Shading mShading, Shape mShape){
         this.mCount = mCount;
@@ -63,8 +66,8 @@ public class Card {
                 return "RED";
             case GREEN:
                 return "GREEN";
-            case PURPLE:
-                return "PURPLE";
+            case BLUE:
+                return "BLUE";
             default:
                 return "UNKNOWN";
         }
@@ -97,5 +100,13 @@ public class Card {
             default:
                 return "UNKNOWN";
         }
+    }
+
+    public int getImageRes() {
+        return mImageRes;
+    }
+
+    public void setImageRes(Integer imageRes) {
+        this.mImageRes = imageRes;
     }
 }

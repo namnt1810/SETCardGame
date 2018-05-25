@@ -6,9 +6,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Set;
 
 public class MainGameActivity extends AppCompatActivity implements View.OnClickListener {
@@ -30,34 +29,21 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
             R.id.image12
     };
 
+    private SetGame mGame;
+
     private Set<Integer> mSelectedCardIds;
 
-    private Deck mDeck;
 
-    private Card[] mTable;
-
-    private Map<Integer, Card> mViewIdToCards;
-
-    private void initGame() {
-        mSelectedCardIds = new HashSet<>();
-        mDeck = new Deck();
-        mTable = mDeck.makeTable();
-    }
-
+    /** initViews() method used to find View by Id
+     */
     private void initViews() {
         int length = mViewIds.length;
         mImageViews = new ImageView[length];
         for (int i = 0; i < length; i++) {
             mImageViews[i] = findViewById(mViewIds[i]);
             mImageViews[i].setOnClickListener(this);
-        }
-    }
-
-    private void matchingCards() {
-        int tableIndex = 0;
-        mViewIdToCards = new HashMap<>();
-        for (int viewId : mViewIds) {
-            mViewIdToCards.put(viewId, mTable[tableIndex++]);
+//            Card cardFromViewId = mGame.getTable().getCardFromViewId(mViewIds[i]);
+//            mImageViews[i].setImageResource(cardFromViewId.getImageRes());
         }
     }
 
@@ -66,32 +52,79 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setcard_game);
         initViews();
-        initGame();
-        matchingCards();
+        mGame = new SetGame(); //new game
+        mGame.matchingViewIds(mViewIds); //connect id to card indices
+        mSelectedCardIds = new HashSet<>();
     }
 
 
+    private int[] asArray() {
+        int size = mSelectedCardIds.size();
+        int[] ids = new int[size];
+        Iterator<Integer> iterator = mSelectedCardIds.iterator();
+        for(int i = 0; i < size; i++) {
+            ids[i] = iterator.next();
+        }
+        return ids;
+    }
+
     @Override
     public void onClick(View v) {
-
-        // 1. Check number of card was selected, is it less than or equal 3;
-        // 1.1 How to instruct computer which cards are selected? => data structure.
-        // 1.2 How to know number of selected cards.
-
-
         int id = v.getId();
 
-
-
-        if (mSelectedCardIds.contains(id)) { // Check if re-select
-            // Nothing to do here since this card exists in selected cards.
+        if (mSelectedCardIds.contains(id)) {
+            mSelectedCardIds.remove(id);// Check if re-select
             return;
         }
-
         // otherwise, add the selected ID to set.
         mSelectedCardIds.add(id);
 
-        if (3 == mSelectedCardIds.size()) {
+        if (3 != mSelectedCardIds.size()){
+            return;
+        }
+
+        //SetGame handles all the logic of games!!!
+
+        GameTable table = mGame.getTable();
+        if (table != null) {
+
+            int[] selectedViewIds = asArray();
+            Card[] selectedCards = new Card[selectedViewIds.length];
+            for (int i = 0; i < selectedViewIds.length; i++) {
+                selectedCards[i] = mGame.getSelectedCard(selectedViewIds[i]);
+            }
+
+            //check if there is an index = -1
+            if (mGame.isSet(selectedCards[0], selectedCards[1], selectedCards[2])) {
+                //TODO: logic to handle if 3 cards are a set.
+                table.removeCardsByViewIds(mSelectedCardIds);
+                int[] emptyPositions = table.getEmptyCardPositions();
+                table.refill(mGame.generateNextCards());
+                table.matchingElements(selectedViewIds, emptyPositions);
+                mSelectedCardIds.clear();
+                Toast.makeText(this, "One SET found", Toast.LENGTH_SHORT).show();
+            } else {
+                //TODO: not a set, your logic goes here.
+
+                mSelectedCardIds.clear();
+                Toast.makeText(this, "Not a SET", Toast.LENGTH_SHORT).show();
+            }
+//            if (!mGame.isSet(selectedCards[0], selectedCards[1], selectedCards[2])){
+//                System.out.println("Not a Set. Please choose three cards again");
+//
+//                //remove elements in mSelectedCardIds?
+//                Iterator<Integer> iterator1 = mSelectedCardIds.iterator();
+//                while (iterator1.hasNext()) {
+//                    iterator1.remove();
+//                }
+//
+//                return;
+//            }
+
+            //remove elements in mSelectedCardIds
+
+
+
             // TODO: implement your logic to check cards are a set here.
             // 1. Check a set
             // 2. Reset cards, clear selected cards.
@@ -105,8 +138,8 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
         // 3. Reset cards background to default after processed above steps.
 
 
-        int viewId = v.getId();
-        Card card = mViewIdToCards.get(viewId);
-        Toast.makeText(this, card.toString(), Toast.LENGTH_SHORT).show();
+//        int viewId = v.getId();
+//        Card card = mViewIdToCards.get(viewId);
+//        Toast.makeText(this, card.toString(), Toast.LENGTH_SHORT).show();
     }
 }
