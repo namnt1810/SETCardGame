@@ -42,6 +42,10 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
         for (int i = 0; i < length; i++) {
             mImageViews[i] = findViewById(mViewIds[i]);
             mImageViews[i].setOnClickListener(this);
+
+            //where to put this?
+           // Card cardFromViewId = mGame.getTable().getCardFromViewId(mViewIds[i]);
+           // setImagesToImageViews(mImageViews[i], cardFromViewId);
 //            Card cardFromViewId = mGame.getTable().getCardFromViewId(mViewIds[i]);
 //            mImageViews[i].setImageResource(cardFromViewId.getImageRes());
         }
@@ -54,6 +58,12 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
         initViews();
         mGame = new SetGame(); //new game
         mGame.matchingViewIds(mViewIds); //connect id to card indices
+
+        for (int i = 0; i < mViewIds.length ; i++) {
+            Card cardFromViewId = mGame.getTable().getCardFromViewId(mViewIds[i]);
+            mImageViews[i].setImageResource(cardFromViewId.getImageRes());
+        }
+
         mSelectedCardIds = new HashSet<>();
     }
 
@@ -83,8 +93,6 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
             return;
         }
 
-        //SetGame handles all the logic of games!!!
-
         GameTable table = mGame.getTable();
         if (table != null) {
 
@@ -94,15 +102,15 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
                 selectedCards[i] = mGame.getSelectedCard(selectedViewIds[i]);
             }
 
-            //check if there is an index = -1
             if (mGame.isSet(selectedCards[0], selectedCards[1], selectedCards[2])) {
                 //TODO: logic to handle if 3 cards are a set.
+                Toast.makeText(this, "One SET found", Toast.LENGTH_SHORT).show();
                 table.removeCardsByViewIds(mSelectedCardIds);
                 int[] emptyPositions = table.getEmptyCardPositions();
                 table.refill(mGame.generateNextCards());
                 table.matchingElements(selectedViewIds, emptyPositions);
                 mSelectedCardIds.clear();
-                Toast.makeText(this, "One SET found", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "One SET found", Toast.LENGTH_SHORT).show();
             } else {
                 //TODO: not a set, your logic goes here.
 

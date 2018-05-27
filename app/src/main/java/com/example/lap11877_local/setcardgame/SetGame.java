@@ -19,10 +19,6 @@ public class SetGame {
         return mTable;
     }
 
-    public Deck getDeck(){
-        return mDeck;
-    }
-
     public Card getSelectedCard (int viewId){
         return mTable.getCardFromViewId(viewId);
     }
