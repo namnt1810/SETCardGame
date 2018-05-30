@@ -8,11 +8,16 @@ import com.example.lap11877_local.setcardgame.Features.Shape;
 public class Card {
     public static final String CARD_ID_FORMAT = "%d%d%d%d";
 
+    public static final int CARD_IN_TABLE = 0;
+
+    public static final int CARD_NOT_IN_TABLE = 1;
+
     private Count mCount;
     private Color mColor;
     private Shading mShading;
     private Shape mShape;
     private int mImageRes;
+    private int mStatus;
 
     public Card (Count mCount, Color mColor, Shading mShading, Shape mShape){
         this.mCount = mCount;
@@ -107,6 +112,17 @@ public class Card {
     }
 
     public void setImageRes(Integer imageRes) {
+        if (imageRes == null){
+            return;
+        }
         this.mImageRes = imageRes;
+    }
+
+    public int getStatus() {
+        return mStatus;
+    }
+
+    public void setStatus(int mStatus) {
+        this.mStatus = mStatus;
     }
 }

@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">SET amazing card game</string>
+    <string name="app_name">SET</string>
+    <string name="rule">RULE</string>
+    <string name="shuffle">SHUFFLE</string>
+    <string name="dialog_set_rule">The object of the game is to identify a SET of three cards from 12 cards laid out on the table. Each card has a variation of the following four features:\n\n (A) Color: \nEach card is red, green, or purple.\n\n(B) Symbol: \nEach card contains ovals, squiggles, or diamonds.\n\n(C) Number: \nEach card has one, two, or three symbols.\n\n(D) Shading: Each card is solid, open, or striped.\n\nA SET consists of three cards in which each feature is EITHER the same on each card OR is different on each card. That is to say, any feature in the SET of three cards is either common to all three cards or is different on each card.</string>
+    <string name="RULE">rule</string>
+    <string name="back">BACK</string>
+
 </resources>

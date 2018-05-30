@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class Deck {
-    private final int POSITION_NONE = -1;
+//    private final int POSITION_NONE = -1;
 
     private int TOTAL_CARDS = 81;
 
@@ -21,11 +21,12 @@ public class Deck {
 
     private Random mRandom = new Random();
 
-    private int mCardsLeft = TOTAL_CARDS;
+    //private int mCardsLeft = TOTAL_CARDS;
+
 
     public Deck(){
-        makeDeck();
         makeImagesResourceMap();
+        makeDeck();
     }
 
     private void makeDeck(){
@@ -49,14 +50,15 @@ public class Deck {
                         shading = shadings[shadingIndex];
                         shape = shapes [shapeIndex];
 
-                        Card card = new Card(count, color, shading, shape);
-
                         String cardIdString = String.format(Locale.getDefault(),
                                 Card.CARD_ID_FORMAT,
                                 countIndex, colorIndex, shadingIndex, shapeIndex);
 
+                        Card card = new Card(count, color, shading, shape);
+
                         Integer cardImageResId = mCardResIdMap.get(cardIdString);
                         card.setImageRes(cardImageResId);
+                        card.setStatus(Card.CARD_NOT_IN_TABLE);
 
                         mDeck[cardsIndex] = card;
                         cardsIndex++;
@@ -236,23 +238,27 @@ public class Deck {
     public Card[] makeTable(){
         int tableSize = 12;
         Card[] table = new Card[tableSize];
+        int tableIndex =0;
         int selectIndex;
 
-        for (int tableIndex = 0; tableIndex < tableSize; tableIndex++) {
+        while (tableIndex < tableSize){
             selectIndex = getAvailableIndex();
-            if (selectIndex != POSITION_NONE ) {
-                table[tableIndex] = mDeck[selectIndex];
-                mDeck[selectIndex] = null;
-                mCardsLeft--;
+//            if (selectIndex != POSITION_NONE){
+                Card card = mDeck[selectIndex];
+                if (card.getStatus() == Card.CARD_NOT_IN_TABLE) {
+                    card.setStatus(Card.CARD_IN_TABLE);
+                    table[tableIndex] = card;
+                    tableIndex++;
+                }
             }
-        }
-        return table;
+//        }
+            return table;
     }
 
     public int getAvailableIndex(){
-        if(isEmpty()) {
-            return POSITION_NONE;
-        }
+//        if(isEmpty()) {
+//            return POSITION_NONE;
+//        }
         int randomIndex = mRandom.nextInt(TOTAL_CARDS);
         while(!isAvailable(randomIndex)){
             randomIndex = mRandom.nextInt(TOTAL_CARDS);
@@ -260,9 +266,9 @@ public class Deck {
         return randomIndex;
     }
 
-    public boolean isEmpty(){
-        return mCardsLeft == 0;
-    }
+//    public boolean isEmpty(){
+//        return mCardsLeft == 0;
+//    }
 
     public boolean isAvailable(int randomIndex){
         return isValidIndex(randomIndex) && mDeck[randomIndex] != null;
@@ -273,20 +279,25 @@ public class Deck {
     }
 
     public Card[] generateCards(int numberOfCardsToGenerate) {
-        if (isEmpty()) {
-            // Game end, no more cards left.
-            return null;
-        }
+//        if (isEmpty()) {
+//             Game end, no more cards left.
+//            return null;
+//        }
 
-        Card[] cards = new Card[numberOfCardsToGenerate];
-        for(int i = 0; i < numberOfCardsToGenerate; i++) {
+        Card[] cardsArray = new Card[numberOfCardsToGenerate];
+        int cardIndex = 0;
+
+        while (cardIndex < numberOfCardsToGenerate) {
             int availableIndex = getAvailableIndex();
-            if (POSITION_NONE != availableIndex) {
-                cards[i] = mDeck[availableIndex];
-                mDeck[availableIndex] = null;
-                mCardsLeft--;
+//            if (POSITION_NONE != availableIndex) {
+                Card card = mDeck[availableIndex];
+                if (card.getStatus() == Card.CARD_NOT_IN_TABLE) {
+                    card.setStatus(Card.CARD_IN_TABLE);
+                    cardsArray[cardIndex] = card;
+                    cardIndex++;
+                }
             }
-        }
-        return cards;
+//        }
+        return cardsArray;
     }
 }

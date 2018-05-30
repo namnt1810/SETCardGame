@@ -76,13 +76,6 @@ public class GameTable {
         }
     }
 
-    public int getIndexFromViewId(int viewId) {
-        Integer index = mViewIdsToCardIndices.get(viewId);
-        if (index == null) {
-            return NO_INDEX;
-        }
-        return index;
-    }
     public Card getCardFromViewId (int viewId){
         Card card = null;
         Integer index = mViewIdsToCardIndices.get(viewId);
@@ -128,6 +121,12 @@ public class GameTable {
         }
         for (Integer viewId : viewIds) {
             remove(mViewIdsToCardIndices.get(viewId));
+        }
+    }
+
+    public void resetCardStatusInTable(){
+        for (int i = 0; i < NUM_OF_TABLE_CARDS; i++) {
+            mCards[i].setStatus(Card.CARD_NOT_IN_TABLE);
         }
     }
 }

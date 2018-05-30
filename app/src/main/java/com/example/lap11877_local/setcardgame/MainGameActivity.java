@@ -1,9 +1,12 @@
 package com.example.lap11877_local.setcardgame;
 
+import android.os.Handler;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.HashSet;
@@ -29,10 +32,15 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
             R.id.image12
     };
 
+    private TextView mScoreView;
+
     private SetGame mGame;
 
     private Set<Integer> mSelectedCardIds;
 
+    private int mScore = 0;
+
+    private Handler mHandler = new Handler();
 
     /** initViews() method used to find View by Id
      */
@@ -42,13 +50,32 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
         for (int i = 0; i < length; i++) {
             mImageViews[i] = findViewById(mViewIds[i]);
             mImageViews[i].setOnClickListener(this);
-
-            //where to put this?
-           // Card cardFromViewId = mGame.getTable().getCardFromViewId(mViewIds[i]);
-           // setImagesToImageViews(mImageViews[i], cardFromViewId);
-//            Card cardFromViewId = mGame.getTable().getCardFromViewId(mViewIds[i]);
-//            mImageViews[i].setImageResource(cardFromViewId.getImageRes());
         }
+
+        View mShuffleButton;
+
+        View mRuleButton;
+
+        mScoreView = findViewById(R.id.score_button);
+        mScoreView.setText(String.format("SCORE: 0"));
+
+        mShuffleButton = findViewById(R.id.shuffle_button);
+        mShuffleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                shuffleTable();
+                mScore--;
+                mScoreView.setText(String.format("SCORE: %d", mScore));
+            }
+        });
+
+        mRuleButton = findViewById(R.id.rule_button);
+        mRuleButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                rule_description();
+           }
+        });
     }
 
     @Override
@@ -67,6 +94,11 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
         mSelectedCardIds = new HashSet<>();
     }
 
+    private void rule_description(){
+        DialogFragment newFragment = new Rule();
+        newFragment.show(getSupportFragmentManager(), "back");
+    }
+
 
     private int[] asArray() {
         int size = mSelectedCardIds.size();
@@ -78,76 +110,95 @@ public class MainGameActivity extends AppCompatActivity implements View.OnClickL
         return ids;
     }
 
+    private void shuffleTable() {
+        mGame.getTable().resetCardStatusInTable();
+        GameTable newTable = new GameTable(mGame.shuffleTable());
+        mGame.setTable(newTable);
+        mGame.matchingViewIds(mViewIds);
+        for (int i = 0; i < mViewIds.length ; i++) {
+            Card cardFromViewId = mGame.getTable().getCardFromViewId(mViewIds[i]);
+            mImageViews[i].setImageResource(cardFromViewId.getImageRes());
+        }
+    }
+
     @Override
     public void onClick(View v) {
         int id = v.getId();
 
         if (mSelectedCardIds.contains(id)) {
             mSelectedCardIds.remove(id);// Check if re-select
+            v.setSelected(false);
             return;
         }
         // otherwise, add the selected ID to set.
         mSelectedCardIds.add(id);
+        v.setSelected(true);
 
         if (3 != mSelectedCardIds.size()){
             return;
         }
 
-        GameTable table = mGame.getTable();
+        final GameTable table = mGame.getTable();
         if (table != null) {
 
-            int[] selectedViewIds = asArray();
+            final int[] selectedViewIds = asArray();
             Card[] selectedCards = new Card[selectedViewIds.length];
             for (int i = 0; i < selectedViewIds.length; i++) {
                 selectedCards[i] = mGame.getSelectedCard(selectedViewIds[i]);
             }
 
             if (mGame.isSet(selectedCards[0], selectedCards[1], selectedCards[2])) {
-                //TODO: logic to handle if 3 cards are a set.
-                Toast.makeText(this, "One SET found", Toast.LENGTH_SHORT).show();
-                table.removeCardsByViewIds(mSelectedCardIds);
-                int[] emptyPositions = table.getEmptyCardPositions();
-                table.refill(mGame.generateNextCards());
-                table.matchingElements(selectedViewIds, emptyPositions);
-                mSelectedCardIds.clear();
-                //Toast.makeText(this, "One SET found", Toast.LENGTH_SHORT).show();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        clearSelectedViews();
+                        Toast.makeText(MainGameActivity.this, "One SET found", Toast.LENGTH_SHORT).show();
+                        mScore++;
+                        setScore();
+                        table.removeCardsByViewIds(mSelectedCardIds);
+                        int[] emptyPositions = table.getEmptyCardPositions();
+                        Card[] generatedCards = mGame.generateNextCards();
+                        table.refill(generatedCards);
+                        table.matchingElements(selectedViewIds, emptyPositions);
+                        for (int i = 0; i < selectedViewIds.length; i++) {
+                           ImageView selectedView = findViewById(selectedViewIds[i]);
+                           selectedView.setImageResource(generatedCards[i].getImageRes());
+                        }
+                        mSelectedCardIds.clear();
+                    }
+                }, 1000L);
+
             } else {
-                //TODO: not a set, your logic goes here.
-
-                mSelectedCardIds.clear();
-                Toast.makeText(this, "Not a SET", Toast.LENGTH_SHORT).show();
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        clearSelectedViews();
+                        mSelectedCardIds.clear();
+                        Toast.makeText(MainGameActivity.this, "Not a SET", Toast.LENGTH_SHORT).show();
+                    }
+                }, 1000L);
             }
-//            if (!mGame.isSet(selectedCards[0], selectedCards[1], selectedCards[2])){
-//                System.out.println("Not a Set. Please choose three cards again");
-//
-//                //remove elements in mSelectedCardIds?
-//                Iterator<Integer> iterator1 = mSelectedCardIds.iterator();
-//                while (iterator1.hasNext()) {
-//                    iterator1.remove();
-//                }
-//
-//                return;
-//            }
-
-            //remove elements in mSelectedCardIds
-
-
-
-            // TODO: implement your logic to check cards are a set here.
-            // 1. Check a set
-            // 2. Reset cards, clear selected cards.
-
-            // iterate over selected card IDs, reset its background.
-            //mSelectedCardIds.clear();
         }
+    }
 
+    private void clearSelectedViews() {
+        for (Integer cardId : mSelectedCardIds) {
+            View imageView = findViewById(cardId);
+            if (imageView != null) {
+                imageView.setSelected(false);
+            }
+        }
+    }
 
-        // 2. Validate the selected cards if they're a set.
-        // 3. Reset cards background to default after processed above steps.
+    private void setScore() {
+        mScoreView.setText(String.format("SCORE: %d", mScore));
+    }
 
-
-//        int viewId = v.getId();
-//        Card card = mViewIdToCards.get(viewId);
-//        Toast.makeText(this, card.toString(), Toast.LENGTH_SHORT).show();
+    @Override
+    protected void onDestroy() {
+        if (mHandler != null) {
+            mHandler.removeCallbacks(null);
+        }
+        super.onDestroy();
     }
 }

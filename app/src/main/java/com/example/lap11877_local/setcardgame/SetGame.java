@@ -87,4 +87,12 @@ public class SetGame {
     public Card[] generateNextCards() {
         return mDeck.generateCards(3);
     }
+
+    public Card[] shuffleTable(){
+        return mDeck.generateCards(12);
+    }
+
+    public void setTable(GameTable mTable) {
+        this.mTable = mTable;
+    }
 }
